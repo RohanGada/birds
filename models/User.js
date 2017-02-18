@@ -56,6 +56,7 @@ var models = {
       });
     },
     deleteDataByFlockUserId: function(data, callback) {
+      // console.log(data);
       User.findOneAndRemove({
         id: data.userId
       }).exec(function(err, data) {
@@ -93,6 +94,6 @@ var models = {
         }
       });
     }
-}
+};
 
 module.exports = _.assign(module.exports, models);

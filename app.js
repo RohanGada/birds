@@ -3,6 +3,7 @@ var config = require('./config.js');
 var express = require('express');
 var _ = require('lodash');
 var request = require("request");
+// DB connection
 var mongodb = require('mongodb');
 var mongoose = require('mongoose');
 var db = mongoose.connect('mongodb://localhost:27017/company', function(err, data) {
@@ -13,18 +14,30 @@ var db = mongoose.connect('mongodb://localhost:27017/company', function(err, dat
     }
 });
 var User = require('./models/User');
+// DB connection end
 
+// Flock Credentials
 flock.appId = config.appId;
 flock.appSecret = config.appSecret;
+// Flock Credentials end
+
+
+
+//Express setup
 var app = express();
 app.use(flock.events.tokenVerifier);
 app.post('/events', flock.events.listener);
+// app.get('/render', function(event, callback) {
+//     console.log("Ye le teri event")
+// });
 app.listen(8080, function() {
     console.log('listening on 8080');
-})
+});
+//Express setup end
+
 
 flock.events.on('app.install', function(event, callback) {
-    console.log(event.token);
+    // console.log(event.token);
     callback();
 
     setTimeout(function() {
@@ -34,10 +47,6 @@ flock.events.on('app.install', function(event, callback) {
                 token: event.token
             }
         }, function(err, http, body) {
-            // if (body) {
-            //     body = JSON.parse(body);
-            // }
-            console.log(body);
             if (err) {
                 console.log('Some error occurred');
             } else if (!_.isEmpty(body)) {
@@ -54,8 +63,8 @@ flock.events.on('app.install', function(event, callback) {
         });
     }, 2000);
 });
+
 flock.events.on('app.uninstall', function(event, callback) {
-    console.log(event);
     User.deleteDataByFlockUserId(event, function(err, data) {
         if (err) {
             callback(err);
@@ -64,12 +73,23 @@ flock.events.on('app.uninstall', function(event, callback) {
         }
     });
 });
+// flock.events.on('/render', function(event, callback) {
+//     console.log('calendar');
+// });
 
 flock.events.on('client.slashCommand', function(event, callback) {
-    // handle slash command event here
-    // ...
-    // invoke the callback to send a response to the event
-    // console.log(event);
+    if(event && event.text){
+      var txt = event.text.toLowerCase();
+      if(txt.indexOf('to') == -1){
+        console.log(txt);
+      }else{
+        var strArr = txt.split('to');
+        var hasFrom = strArr[0];
+        var hasTo = strArr[1];
+        console.log("hasFrom",hasFrom);
+        console.log("hasTo",hasTo)
+      }
+    }
     callback(null, {
         text: 'Received your command'
     });
