@@ -3,6 +3,7 @@ var config = require('./config.js');
 var express = require('express');
 var _ = require('lodash');
 var request = require("request");
+var chrono = require('chrono-node')
 // DB connection
 var mongodb = require('mongodb');
 var mongoose = require('mongoose');
@@ -50,6 +51,7 @@ flock.events.on('app.install', function(event, callback) {
             if (err) {
                 console.log('Some error occurred');
             } else if (!_.isEmpty(body)) {
+              console.log(body);
                 User.saveData(JSON.parse(body), function(err, data) {
                     if (err) {
                         console.warn(err);
@@ -76,18 +78,29 @@ flock.events.on('app.uninstall', function(event, callback) {
 // flock.events.on('/render', function(event, callback) {
 //     console.log('calendar');
 // });
-
+var parseDate = function (text) {
+  var d = chrono.parseDate(text);
+  if(d){
+      return d;
+  }else{
+    return null;
+  }
+};
 flock.events.on('client.slashCommand', function(event, callback) {
     if(event && event.text){
-      var txt = event.text.toLowerCase();
-      if(txt.indexOf('to') == -1){
-        console.log(txt);
+      // console.log(event.text.indexOf('"'));
+      var reason = event.text.substring(event.text.indexOf('\"')+1,event.text.lastIndexOf('\"'));
+      // console.log(reason);
+      // console.log(event.text);
+      var dates = event.text.toLowerCase().substring(event.text.lastIndexOf('\"'));
+      if(dates.indexOf('to') == -1){
+        console.log(parseDate(dates[0]));
       }else{
-        var strArr = txt.split('to');
+        var strArr = dates.split('to');
         var hasFrom = strArr[0];
         var hasTo = strArr[1];
-        console.log("hasFrom",hasFrom);
-        console.log("hasTo",hasTo)
+        console.log(parseDate(hasFrom));
+        console.log(parseDate(hasTo));
       }
     }
     callback(null, {

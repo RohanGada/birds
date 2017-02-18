@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chrono-node": "^1.2.5",
     "express": "^4.14.1",
     "flockos": "0.0.6",
     "lodash": "^4.17.4",
