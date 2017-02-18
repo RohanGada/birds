@@ -11,6 +11,8 @@
   "dependencies": {
     "express": "^4.14.1",
     "flockos": "0.0.6",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "mongodb": "2.1.7",
+    "mongoose": "^4.8.3"
   }
 }
