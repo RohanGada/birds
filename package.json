@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "flockos": "0.0.6"
+    "express": "^4.14.1",
+    "flockos": "0.0.6",
+    "lodash": "^4.17.4"
   }
 }
