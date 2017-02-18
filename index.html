@@ -1,0 +1,11 @@
+<button type="button" name="button" ng-click="showmore = true;" ng-if="elements.length > 4 && !showmore">{{elements.length - 4}}</button>
+<ul>
+  <li ng-repeat= "item in elements" ng-if="$index < 4 || showmore">{{item}}</li>
+</ul>
+
+
+<ul>
+<li ng-repeat= "item in (elem = (elements | limitTo:limitElements))" >{{item}}</li>
+
+</ul>
+<button type="button" name="button" ng-click="limitElements = elements.length" ng-show="elements.length > 4 && elements.length != elem.length">{{elements.length - 4 + ' more'}}</button>
