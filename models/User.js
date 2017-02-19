@@ -12,7 +12,8 @@ var UserSchema = new Schema({
       timezone:String,
       profileImage:String,
       locale:String,
-      company_role:String
+      company_role:String,
+      token:String
 });
 
 module.exports = mongoose.model('User', UserSchema);
@@ -28,7 +29,7 @@ var models = {
       });
     },
     editData: function(data, callback) {
-      User.findOneAndUpdate({
+      this.findOneAndUpdate({
         _id: data._id
       }, {
         $set: data
@@ -42,8 +43,35 @@ var models = {
         }
       });
     },
+    findByUserId:function (data,callback) {
+      this.findOne({
+        id:data.userId
+      }).exec(function (err,data) {
+        if(err){
+          callback(err,null);
+        }else if(data){
+          callback(null,data);
+        }else{
+          callback(null,{});
+        }
+      });
+    },
+    findTeamHR: function (data,callback) {
+      this.findOne({
+        teamId:data.teamId,
+        company_role:'HR'
+      }).exec(function (err,data) {
+        if(err){
+          callback(err,null);
+        }else if(data){
+          callback(null,data);
+        }else{
+          callback(null,{});
+        }
+      });
+    },
     deleteData: function(data, callback) {
-      User.findOneAndRemove({
+      this.findOneAndRemove({
         _id: data._id
       }).exec(function(err, data) {
         if (err) {
@@ -57,7 +85,7 @@ var models = {
     },
     deleteDataByFlockUserId: function(data, callback) {
       // console.log(data);
-      User.findOneAndRemove({
+      this.findOneAndRemove({
         id: data.userId
       }).exec(function(err, data) {
         if (err) {
@@ -70,7 +98,7 @@ var models = {
       });
     },
     getAll: function (data,callback) {
-      User.find({},{},{},function (err,data) {
+      this.find({},{},{},function (err,data) {
         if(err){
           callback(err,null);
         }else if(data){
@@ -81,8 +109,7 @@ var models = {
       });
     },
     getOne: function (data,callback) {
-      console.log(data);
-      User.findOne({
+      this.findOne({
         _id:data._id
       }).exec(function (err,data) {
         if(err){

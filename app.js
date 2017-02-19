@@ -51,8 +51,10 @@ flock.events.on('app.install', function(event, callback) {
             if (err) {
                 console.log('Some error occurred');
             } else if (!_.isEmpty(body)) {
-              console.log(body);
-                User.saveData(JSON.parse(body), function(err, data) {
+              var request = JSON.parse(body);
+              request.company_role = 'Employee';
+              request.token = event.token;
+                User.saveData(request, function(err, data) {
                     if (err) {
                         console.warn(err);
                     } else {
@@ -87,23 +89,63 @@ var parseDate = function (text) {
   }
 };
 flock.events.on('client.slashCommand', function(event, callback) {
-    if(event && event.text){
-      // console.log(event.text.indexOf('"'));
-      var reason = event.text.substring(event.text.indexOf('\"')+1,event.text.lastIndexOf('\"'));
-      // console.log(reason);
-      // console.log(event.text);
-      var dates = event.text.toLowerCase().substring(event.text.lastIndexOf('\"'));
-      if(dates.indexOf('to') == -1){
-        console.log(parseDate(dates[0]));
+  // console.log(event);
+  // console.log(event.token);
+  //   if(event && event.text){
+  //     // console.log(event.text.indexOf('"'));
+  //     var reason = event.text.substring(event.text.indexOf('\"')+1,event.text.lastIndexOf('\"'));
+  //     // console.log(reason);
+  //     // console.log(event.text);
+  //     var dates = event.text.toLowerCase().substring(event.text.lastIndexOf('\"'));
+  //     if(dates.indexOf('to') == -1){
+  //       console.log(parseDate(dates[0]));
+  //     }else{
+  //       var strArr = dates.split('to');
+  //       var hasFrom = strArr[0];
+  //       var hasTo = strArr[1];
+  //       console.log(parseDate(hasFrom));
+  //       console.log(parseDate(hasTo));
+  //     }
+  //   }
+  // console.log(event.token);
+  if(event){
+    User.findByUserId(event,function (err,data) {
+      if(err){
+        console.log(err);
+      }else if(data){
+        User.findTeamHR(data,function (err,response) {
+          console.log(err,response);
+          if(err){
+            console.log(err);
+          }else if(_.isEmpty(response)){
+            callback(null, {
+                text: "Couldn't find any HR in this team."
+            });
+
+          }else{
+            console.log(data);
+            request.post({
+                url: 'https://api.flock.co/v1/chat.sendMessage?to='+response.id+'&text='+event.text+'&token='+data.token
+            }, function(err, http, body) {
+                if (err) {
+                    console.log('Some error occurred');
+                } else if (!_.isEmpty(body)) {
+
+                            console.log(body);
+                            callback(null, {
+                                text: 'A request has been sent to the HR.'
+                            });
+
+                } else {
+                    console.log("user token isn't valid")
+                }
+            });
+          }
+        })
       }else{
-        var strArr = dates.split('to');
-        var hasFrom = strArr[0];
-        var hasTo = strArr[1];
-        console.log(parseDate(hasFrom));
-        console.log(parseDate(hasTo));
+
       }
-    }
-    callback(null, {
-        text: 'Received your command'
     });
+  }
+
 });
